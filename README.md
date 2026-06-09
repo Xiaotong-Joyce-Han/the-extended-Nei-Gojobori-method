@@ -17,13 +17,13 @@ The program can be run from the command line:
 
 `python </path/run_extended_ng.py> --sequence-file <path> --outfile <path> --optional-argument <optional_argument-value>`
 
-Required arguments:
+### Required arguments:
 
 `--sequence-file <path>`
 
 `--outfile <path>`
 
-Optional arguments:
+### Optional arguments:
 
 `--spectrum-file <path>`
 
