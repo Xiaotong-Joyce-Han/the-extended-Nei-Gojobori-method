@@ -80,7 +80,7 @@ An example:
         0.50
         0.30
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as these 6 parameters are in the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as these 6 parameters are on the same scale.
 
 ----------
 Format 2: labeled 6-parameter format
@@ -95,7 +95,7 @@ An example:
         CGtoTA 0.20
 
 Please note that labels should be consistent with indicated in the example. The order of labels does not matter.
-These numbers could be actual mutation rate * some arbitrary constant, as long as these 6 parameters are in the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as these 6 parameters are on the same scale.
 
 ----------
 Format 3: ordered 8-parameter format
@@ -122,10 +122,10 @@ An example:
         3
         4.5
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as:
- a, b, and c should be in the same scale. 
- d, e, and f should be in the same scale.
- g and h should be in the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as:
+ a, b, and c should be on the same scale. 
+ d, e, and f should be on the same scale.
+ g and h should be on the same scale.
 
 ----------
 Format 4: labeled 8-parameter format
@@ -142,10 +142,10 @@ An example:
         CGrate 1.2
 
 Please note that labels should be consistent with indicated in the example. The order of labels does not matter.
-These numbers could be actual mutation rate * some arbitrary constant, as long as:
- Relative mutation rate of different point mutations from A/T should be in the same scale. 
- Relative mutation rate of different point mutations from C/G should be in the same scale.
- Mutation rate of A/T and C/G should be in the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as:
+ Relative mutation rate of different point mutations from A/T should be on the same scale. 
+ Relative mutation rate of different point mutations from C/G should be on the same scale.
+ Mutation rate of A/T and C/G should be on the same scale.
 
 
 【5】Outfile 
