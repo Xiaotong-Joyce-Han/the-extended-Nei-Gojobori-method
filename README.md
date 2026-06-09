@@ -27,22 +27,22 @@ Optional arguments:
 
 `--spectrum-file <path>`
 
-	Specify mutation spectrum to be used.
+Specify mutation spectrum to be used.
 	
-	If not specified, the program assumes all six mutation types to have equal mutation rates, as did in Nei and Gojobori, 1986.
+If not specified, the program assumes all six mutation types to have equal mutation rates, as did in Nei and Gojobori, 1986.
 
 `--genetic-code <int>`
 
-	Specify genetic code to be used. 
+Specify genetic code to be used. 
 	
-	Please use the index of genetic code as listed in https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi.
+Please use the index of genetic code as listed in https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi.
 	If not specified, the standard code (--genetic-code 1) is assumed.
 
 `--errorfile <path>`
 
-	If specified, errors and warnings will be printed into the error file.
+If specified, errors and warnings will be printed into the error file.
 	
-	If not, errors and warnings will appear in terminal.
+If not, errors and warnings will appear in terminal.
 
 
 ## Sequence file
@@ -93,7 +93,7 @@ An example:
     0.50
     0.30
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as these 6 parameters are on the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as these 6 parameters are on the same scale.
 
 ### Format 2: labeled 6-parameter format
 
@@ -108,7 +108,7 @@ An example:
 
 Please note that labels should be consistent with indicated in the example. The order of labels does not matter.
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as these 6 parameters are on the same scale.
+These numbers could be actual mutation rate times some arbitrary constant, as long as these 6 parameters are on the same scale.
 
 ### Format 3: ordered 8-parameter format
 
@@ -134,7 +134,7 @@ An example:
     3
     4.5
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as:
+These numbers could be actual mutation rate times some arbitrary constant, as long as:
 
  a, b, and c should be on the same scale. 
  
@@ -157,7 +157,7 @@ An example:
 
 Please note that labels should be consistent with indicated in the example. The order of labels does not matter.
 
-These numbers could be actual mutation rate * some arbitrary constant, as long as:
+These numbers could be actual mutation rate times some arbitrary constant, as long as:
 
  Relative mutation rate of different point mutations from A/T should be on the same scale. 
  
