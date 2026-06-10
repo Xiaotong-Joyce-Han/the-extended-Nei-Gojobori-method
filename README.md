@@ -7,9 +7,9 @@ This program is designed for the incorporating mutation spectrum into the Nei-Go
 This program is written in Python and requires Python >= 3.10.
 
 The program should be cited with:
-
+```text
 <citation to be added>
-
+```
 
 ## Usage
 
