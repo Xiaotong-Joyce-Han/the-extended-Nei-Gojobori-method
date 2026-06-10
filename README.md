@@ -135,11 +135,9 @@ An example:
 
 These numbers could be actual mutation rate times some arbitrary constant, as long as:
 
- a, b, and c should be on the same scale. 
- 
- d, e, and f should be on the same scale.
- 
- g and h should be on the same scale.
+1. a, b, and c should be on the same scale.
+2. d, e, and f should be on the same scale.
+3. g and h should be on the same scale.
 
 ### Format 4: labeled 8-parameter format
 
@@ -158,11 +156,9 @@ Please note that labels should be consistent with indicated in the example. The 
 
 These numbers could be actual mutation rate times some arbitrary constant, as long as:
 
- Relative mutation rate of different point mutations from A/T should be on the same scale. 
- 
- Relative mutation rate of different point mutations from C/G should be on the same scale.
- 
- Mutation rate of A/T and C/G should be on the same scale.
+1. Relative mutation rate of different point mutations from A/T should be on the same scale.
+2. Relative mutation rate of different point mutations from C/G should be on the same scale.
+3. Mutation rate of A/T and C/G should be on the same scale.
 
 
 ## Outfile 
