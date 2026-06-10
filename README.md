@@ -52,11 +52,10 @@ The sequence file should consist a header line containing two integers:
 <number_of_sequences> <sequence_length>
 
 The remaining lines should contain one sequence name followed by one sequence line. Therefore, each sequence is represented by two lines:
-
-<sequence_name>
-	
+```text
+<sequence_name>	
 <sequence>
-
+```
 Requirements for the sequence file:
 
 1. The sequence length must be a multiple of 3.
