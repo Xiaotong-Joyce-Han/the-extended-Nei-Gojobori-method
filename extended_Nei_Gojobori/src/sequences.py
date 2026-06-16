@@ -261,7 +261,7 @@ class Sequences:
         self.update_total_pairwise_s_n()
 
 
-    def make_pairwise_matrix_text(self, value_name: str) -> str:
+    def make_pairwise_n_s_matrix_text(self, value_name: str) -> str:
         """
         Return pairwise n_total or s_total as a symmetric matrix in text format.
         The values are rounded to 4 decimal places.
