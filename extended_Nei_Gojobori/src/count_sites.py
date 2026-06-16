@@ -162,4 +162,14 @@ def sequence_N_S(sequence: "Sequence", codon_N_dict: dict[str, float], codon_S_d
         sequence.N_list.append(codon_N_dict[codon])
         sequence.S_list.append(codon_S_dict[codon])
 
+    expected_sum = sequence.length
+    actual_sum = sequence.N + sequence.S
+    sequence.N *= expected_sum/actual_sum
+    sequence.S *= expected_sum/actual_sum
+
+    for value in sequence.N_list:
+        value *= expected_sum/actual_sum
+    for value in sequence.S_list:
+        value *= expected_sum/actual_sum
+
 
