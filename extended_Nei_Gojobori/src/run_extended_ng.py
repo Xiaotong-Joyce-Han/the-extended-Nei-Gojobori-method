@@ -52,11 +52,11 @@ def run_main_logic(args: argparse.Namespace) -> None:
         append_to_outfile(outfile, "")
 
         append_to_outfile(outfile, "Pairwise n between sequences:")
-        append_to_outfile(outfile, seqs.make_pairwise_matrix_text("n_total"))
+        append_to_outfile(outfile, seqs.make_pairwise_n_s_matrix_text("n_total"))
         append_to_outfile(outfile, "")
 
         append_to_outfile(outfile, "Pairwise s between sequences:")
-        append_to_outfile(outfile, seqs.make_pairwise_matrix_text("s_total"))
+        append_to_outfile(outfile, seqs.make_pairwise_n_s_matrix_text("s_total"))
         append_to_outfile(outfile, "")        
 
         mut_spec = read_spectrum_file(spectrum_file)
