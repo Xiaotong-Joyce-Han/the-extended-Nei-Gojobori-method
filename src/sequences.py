@@ -308,7 +308,7 @@ class Sequences:
         return "\n".join(lines)
     
 
-    def count_sequence_N_S(self, codon_N_dict: dict[str, float], codon_S_dict: dict[str, float]):
+    def count_sequence_N_S(self, codon_N_dict: dict[str, float], codon_S_dict: dict[str, float], codon_Stop_dict: dict[str, float]):
         '''
         count N, S for all the sequences in this group
 
@@ -319,9 +319,12 @@ class Sequences:
 
         codon_S_dict : dict[str, float]
             Maps each sense codon to its S under the mutation spectrum.
+
+        codon_Stop_dict : dict[str, float]
+            Maps each sense codon to its Stop under the mutation spectrum.
         '''
         for sequence in self.sequences:
-            sequence_N_S(sequence, codon_N_dict, codon_S_dict)
+            sequence_N_S(sequence, codon_N_dict, codon_S_dict, codon_Stop_dict)
 
     
     def make_N_S_text(self) -> str:

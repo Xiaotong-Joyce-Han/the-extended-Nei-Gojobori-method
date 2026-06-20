@@ -63,8 +63,8 @@ def run_main_logic(args: argparse.Namespace) -> None:
         append_to_outfile(outfile, mut_spec)
         append_to_outfile(outfile, "")   
 
-        codon_N_dict, codon_S_dict = codon_N_S(code_id, mut_spec)
-        seqs.count_sequence_N_S(codon_N_dict, codon_S_dict)
+        codon_N_dict, codon_S_dict, codon_Stop_dict = codon_N_S(code_id, mut_spec)
+        seqs.count_sequence_N_S(codon_N_dict, codon_S_dict, codon_Stop_dict)
         append_to_outfile(outfile, seqs.make_N_S_text())
         append_to_outfile(outfile, "")   
 
