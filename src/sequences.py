@@ -301,7 +301,7 @@ class Sequences:
                     else:
                         value = float("nan")
 
-                row.append(f"{value:.4f}")
+                row.append(f"{value:.9f}")
 
             lines.append("\t".join(row))
 
@@ -345,8 +345,8 @@ class Sequences:
 
             row = [
                 name,
-                f"{N:.4f}",
-                f"{S:.4f}",
+                f"{N:.9f}",
+                f"{S:.9f}",
             ]
 
             lines.append("\t".join(row))
@@ -447,7 +447,7 @@ class Sequences:
                     else:
                         value = float("nan")
 
-                row.append(f"{value:.4f}")
+                row.append(f"{value:.9f}")
 
             lines.append("\t".join(row))
 
@@ -519,7 +519,7 @@ class Sequences:
                     else:
                         value = float("nan")
 
-                row.append(f"{value:.4f}")
+                row.append(f"{value:.9f}")
 
             lines.append("\t".join(row))
 
