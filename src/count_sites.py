@@ -1,5 +1,4 @@
-from genetic_code import GENETIC_CODES
-from genetic_code import make_codon_order
+from genetic_code import GENETIC_CODES, make_codon_order
 from mutation_spectrum import MutationSpectrum
 from typing import TYPE_CHECKING
 
@@ -189,23 +188,14 @@ def sequence_N_S(sequence: "Sequence", codon_N_dict: dict[str, float], codon_S_d
     sequence.N = 0
     sequence.S = 0
     Stop = 0
-    sequence.N_list = list()
-    sequence.S_list = list()
 
     for codon in sequence.codons:
         sequence.N += codon_N_dict[codon]
         sequence.S += codon_S_dict[codon]
         Stop += codon_Stop_dict[codon]
-        sequence.N_list.append(codon_N_dict[codon])
-        sequence.S_list.append(codon_S_dict[codon])
 
     expected_sum = sequence.length
     actual_sum = sequence.N + sequence.S + Stop
     scale = expected_sum/actual_sum 
     sequence.N *= scale
     sequence.S *= scale
-
-    sequence.N_list = [value * scale for value in sequence.N_list]
-    sequence.S_list = [value * scale for value in sequence.S_list]
-
-

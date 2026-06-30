@@ -1,6 +1,6 @@
 from genetic_code import GENETIC_CODES
 import sys
-from count_differences import count_differences
+from count_differences import get_invalid_indices, count_differences
 from count_sites import sequence_N_S
 from Jukes_Cantor_correction import jukes_cantor_correction
 
@@ -14,18 +14,8 @@ class Sequence:
     length : int
     codons : list[str]
 
-    original_indices : list[int]
-        Maps each current codon position back to its original 0-based codon index
-        before pruning ambiguous codons, stop codons, or invalid sites.
-
     N : float
     S : float
-
-    N_list : list[float]
-        Per-codon nonsynonymous sites.
-
-    S_list : list[float]
-        Per-codon synonymous sites.
     """
 
     def __init__(self, name: str, sequence: str):
@@ -36,23 +26,17 @@ class Sequence:
 
         for i in range(0, self.length, 3):
             self.codons.append(self.sequence[i: i+3])
-        
-        # store the 0-based indices 
-        self.original_indices = list(range(len(self.codons)))
 
         self.N = 0
         self.S = 0
-        self.N_list = list()
-        self.S_list = list()
 
 
     def prune(self, indices: list[int]): 
         """
-        delete codons at a list of indices from the current sequence
+        delete codons at a list of indices (in the current sequence) from the current sequence
         """       
         for index in sorted(indices, reverse=True):
             self.codons.pop(index)
-            self.original_indices.pop(index)
 
         self.sequence = "".join(self.codons)
         self.length = len(self.sequence)
@@ -107,14 +91,11 @@ class Sequences:
     ------
     sequences : list[Sequence]
 
-    pairwise_differences : dict[tuple[str, str], dict[str, list[float] | float]]
+    pairwise_differences : dict[tuple[str, str], dict[str, float]]
 
         maps each sequence name pair to their pairwise n, s results.
 
         The inner dictionary contains:
-
-            n_diffs: per-codon n
-            s_diffs: per-codon s
             n_total
             s_total
 
@@ -124,11 +105,19 @@ class Sequences:
 
         The inner dictionary contains: "pN", "pS", "pNpS".
 
-    pairwise_JC_distances_and_ratio: dict[tuple[str, str],bdict[str, float]] 
+    pairwise_JC_distances_and_ratio: dict[tuple[str, str], dict[str, float]] 
 
         maps each sequence name pair to their dN, dS, dN/dS.
         
         The inner dictionary contains: "dN", "dS", "dNdS"
+
+    original_indices : list[int]
+
+        Maps each current codon position back to its original 0-based codon index
+
+        before pruning ambiguous codons, stop codons, or invalid sites.
+
+        This is used for error messages.
     '''
 
 
@@ -138,7 +127,7 @@ class Sequences:
 
         self.pairwise_differences: dict[
             tuple[str, str],
-            dict[str, list[float] | float]
+            dict[str, float]
         ] = {}
 
         self.pairwise_p_distances_and_ratio: dict[
@@ -151,6 +140,8 @@ class Sequences:
             dict[str, float]
         ] = {}
 
+        # store the 0-based indices 
+        self.original_indices = list(range(len(self.sequences[0].codons)))
 
     def __len__(self) -> int:
         '''
@@ -168,27 +159,18 @@ class Sequences:
 
     def prune_all(self, indices: list[int]):
         '''
-        delete codons at specified indices in all of the sequences. Pairwise difference attribute is also updated.
+        delete codons at specified indices in all of the sequences. 
         '''
-        
         indices = sorted(indices, reverse=True)
 
         for seq in self.sequences:
             seq.prune(indices)
         
-        if self.pairwise_differences:
-            for _, dict_for_pair in self.pairwise_differences.items():
-                for _, diffs in dict_for_pair.items():
-                    if isinstance(diffs, list):
-                        for index in indices:
-                            diffs.pop(index)
-
         if self.seq_len() == 0:
             raise ValueError(
                 "All codon sites were removed after filtering ambiguous bases, "
                 "stop codons, or sites without valid mutational pathways."
             ) 
-
 
     
     def __str__(self):
@@ -205,34 +187,27 @@ class Sequences:
         For all the sequences in the group, identify the indices of stop codons and codons containing ambiguous base.
         Codons are deleted at these indices for all sequences.
         '''
-
         indices_to_prune: set[int] = set()
 
         for sequence in self.sequences:
             indices_to_prune.update(sequence.contain_ambiguous_base())
             indices_to_prune.update(sequence.contain_stop_codon(code_id))
-        
+            
         indices_to_prune = sorted(indices_to_prune, reverse=True)
+
+        for index in indices_to_prune:
+            self.original_indices.pop(index)
+
         self.prune_all(indices_to_prune)
 
 
-    def update_total_pairwise_s_n(self):
+    def curate_invalid_pathway_sites(self, table: dict[tuple[str,str], tuple[float, float, bool]], code_id: int):
         '''
-        Given the "n_diffs" and "s_diffs" lists in pairwise_differences, update the "n_total" and "s_total"
+        For all pairs of sequences in the group, identify the positions without any 
+        valid pathway between any pair.
+        Codons are deleted at these indices for all sequences.
         '''
-        if self.pairwise_differences:
-            for _, dict_for_pair in self.pairwise_differences.items():
-                dict_for_pair["n_total"] = sum(dict_for_pair["n_diffs"])
-                dict_for_pair["s_total"] = sum(dict_for_pair["s_diffs"])
-
-
-    def count_pairwise_differences(self, code_id: int):
-        """
-        Count pairwise nonsynonymous and synonymous differences.
-        update the n_totals, s_totals, n_diffs, and s_diffs in the pairwise_differences attribute.
-        """
-
-        invalid_indices: set[int] = set()
+        global_invalid_sites: set[int] = set()
 
         for i in range(len(self.sequences) - 1):
             for j in range(i + 1, len(self.sequences)):
@@ -240,25 +215,35 @@ class Sequences:
                 seq1 = self.sequences[i]
                 seq2 = self.sequences[j]
 
-                n_diffs, s_diffs, invalid_site_indices = count_differences(
-                    seq1,
-                    seq2,
-                    code_id
-                )
+                invalid_site_indices = get_invalid_indices(seq1, seq2, table, code_id, self.original_indices)
+                global_invalid_sites.update(invalid_site_indices)
+        
+        global_invalid_sites = sorted(global_invalid_sites, reverse=True)
 
-                invalid_indices.update(invalid_site_indices)
+        for index in global_invalid_sites:
+            self.original_indices.pop(index)
 
+        self.prune_all(global_invalid_sites)
+
+                        
+    def count_pairwise_differences(self, table: dict[tuple[str,str], tuple[float, float, bool]]):
+        """
+        Count pairwise nonsynonymous and synonymous differences.
+        update the n_diffs, and s_diffs in the pairwise_differences attribute.
+        There should not be any stop codons, ambiguous sites or positions without invalid pathway in the sequences.
+        """
+
+        for i in range(len(self.sequences) - 1):
+            for j in range(i + 1, len(self.sequences)):
+                seq1 = self.sequences[i]
+                seq2 = self.sequences[j]
+
+                n_total, s_total = count_differences(seq1, seq2, table)
                 pair_key = (seq1.name, seq2.name)
-
                 self.pairwise_differences[pair_key] = {
-                    "n_diffs": n_diffs,
-                    "s_diffs": s_diffs,
+                    "n_total": n_total,
+                    "s_total": s_total,
                 }
-
-        if invalid_indices:
-            self.prune_all(sorted(invalid_indices, reverse=True))
-
-        self.update_total_pairwise_s_n()
 
 
     def make_pairwise_n_s_matrix_text(self, value_name: str) -> str:

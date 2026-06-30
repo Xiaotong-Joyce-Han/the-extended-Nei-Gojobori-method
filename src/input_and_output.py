@@ -1,8 +1,7 @@
 from pathlib import Path
 import argparse
 from genetic_code import GENETIC_CODES
-from sequences import Sequence
-from sequences import Sequences
+from sequences import Sequence, Sequences
 from mutation_spectrum import MutationSpectrum
 import sys
 from typing import Any

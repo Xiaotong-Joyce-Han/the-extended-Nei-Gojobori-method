@@ -1,4 +1,4 @@
-from genetic_code import GENETIC_CODES
+from genetic_code import GENETIC_CODES, make_codon_order
 from itertools import permutations
 import sys
 from typing import TYPE_CHECKING
@@ -88,53 +88,84 @@ def count_codon_n_s(codon1:str, codon2:str, code_id:int) -> tuple[float, float]:
     return n_diff, s_diff
 
 
-def count_differences(sequence1: "Sequence", sequence2: "Sequence", code_id: int) -> tuple[list[float], list[float], list[int]]:
+def make_pair_ns_table(code_id) -> dict[tuple[str,str], tuple[float, float, bool]]:
     """
-    Count Nei-Gojobori nonsynonymous and synonymous differences
-    between two sequences of codons.
+    For each pair of codons, calculate and memorize their n, s, validity.
+
+    """
+    code = GENETIC_CODES.get(code_id)
+    codons = make_codon_order(["T", "C", "A", "G"])
+    codons = [codon for codon in codons if not code.is_stop(codon)]
+
+    table = {}
+
+    for c1 in codons:
+        for c2 in codons:
+            try:
+                n, s = count_codon_n_s(c1, c2, code_id)
+                table[(c1, c2)] = (n, s, True)
+            except ValueError:
+                table[(c1, c2)] = (0.0, 0.0, False)
+
+    return table
+
+
+def get_invalid_indices(sequence1: "Sequence", sequence2: "Sequence", table: dict[tuple[str,str], tuple[float, float, bool]], 
+                        code_id: int, original_indices: list[int]) -> list[int]:
+    """
+    First scanning: detect codon positions without valid pathways
 
     Returns
     -------
-    n_diffs : list[float]
-        List of nonsynonymous differences for each codon pair.
-
-    s_diffs : list[float]
-        List of synonymous differences for each codon pair.
-
     invalid_sites_indices : list[int]
-        List of codon indices where there is no valid pathway between the sequence pair.
+        List of codon indices where there is no valid pathway between this sequence pair.
     """
-
-    n_diffs = []
-    s_diffs = []
     invalid_site_indices = []
 
-    codon_index = 0
+    for codon_index, (codon1, codon2) in enumerate(zip(sequence1.codons, sequence2.codons)):
+        _, _, valid = table[(codon1, codon2)]
 
-    for codon1, codon2 in zip(sequence1.codons, sequence2.codons):
-
-        try:
-
-            n_diff, s_diff = count_codon_n_s(codon1, codon2, code_id)
-            n_diffs.append(n_diff)
-            s_diffs.append(s_diff)
-
-        except ValueError as e:
+        if not valid:
 
             invalid_site_indices.append(codon_index)
-
-            original_index = sequence1.original_indices[codon_index]
+            original_index = original_indices[codon_index]
 
             print(f"Error processing sequence{sequence1.name} vs sequence{sequence2.name}, codon pair {codon1} vs {codon2}.\n"
-                  f"{e}\n"
+                  f"No valid mutational path between {codon1} and {codon2} "
+                  f"under genetic code {code_id}. All paths involve stop codons.\n"
                   f"They are at codon index {original_index+1} (1-based index).\n"
-                  f"For all sequences, skipped this codon site and continued with the next one.\n",
+                  f"For all sequences, skipped this codon site.\n",
                   file = sys.stderr)
-            
-            n_diffs.append(-1)
-            s_diffs.append(-1)
+    
+    return invalid_site_indices
 
-        codon_index += 1
 
-    return n_diffs, s_diffs, invalid_site_indices
+def count_differences(sequence1: "Sequence", sequence2: "Sequence", 
+                      table: dict[tuple[str,str], tuple[float, float, bool]]) -> tuple[float, float]:
+    """
+    Second scanning: count Nei-Gojobori nonsynonymous and synonymous differences
+    between two sequences of codons after invalid sites have been removed.
+
+    Returns
+    -------
+    n_total : float
+        Nonsynonymous differences between this pair of sequence.
+
+    s_total : float
+        Synonymous differences between this pair of sequence.
+    """
+
+    n_total = 0
+    s_total = 0
+
+    for (codon1, codon2) in zip(sequence1.codons, sequence2.codons):
+        n_diff, s_diff, valid = table[(codon1, codon2)]
+
+        if not valid:
+            raise ValueError("After removing invalid sites without pathways, there should not be such codon pairs.")
+        
+        n_total += n_diff
+        s_total += s_diff
+
+    return n_total, s_total
 

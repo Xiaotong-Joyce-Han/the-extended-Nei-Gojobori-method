@@ -1,13 +1,10 @@
 import argparse
 import sys
 from contextlib import redirect_stderr
-from input_and_output import parse_args
-from input_and_output import validate_args
-from input_and_output import read_sequence_file
-from input_and_output import read_spectrum_file
-from input_and_output import append_to_outfile
+from input_and_output import parse_args, validate_args, read_sequence_file, read_spectrum_file, append_to_outfile
 from genetic_code import GENETIC_CODES
 from count_sites import codon_N_S
+from count_differences import make_pair_ns_table
 
 
 def main() -> None:
@@ -46,7 +43,9 @@ def run_main_logic(args: argparse.Namespace) -> None:
         append_to_outfile(outfile, f"Length of sequences: {seqs.seq_len()}")
         append_to_outfile(outfile, "")
 
-        seqs.count_pairwise_differences(code_id)
+        pair_ns_table = make_pair_ns_table(code_id)
+        seqs.curate_invalid_pathway_sites(pair_ns_table, code_id)
+        seqs.count_pairwise_differences(pair_ns_table)
         append_to_outfile(outfile, "Further after deleting codons with no valid mutational pathway between any pair of sequences:")
         append_to_outfile(outfile, f"Length of sequences: {seqs.seq_len()}")
         append_to_outfile(outfile, "")
